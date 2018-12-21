@@ -1,0 +1,89 @@
+---
+driver_plugin: vagrant
+driver_config:
+  require_chef_omnibus: 11.6.0
+
+platforms:
+- name: centos-5.9
+  driver_config:
+    box: opscode-centos-5.9
+- name: centos-6.5
+  driver_config:
+    box: opscode-centos-6.5
+- name: centos-7.0
+  driver_config:
+    box: opscode-centos-7.0
+  attributes:
+    persistent_lvm:
+      filesystem: xfs
+- name: centos-7.1
+  driver_config:
+    box: opscode-centos-7.1
+  attributes:
+    persistent_lvm:
+      filesystem: xfs
+- name: debian-7.2.0
+  driver_config:
+    box: opscode-debian-7.2.0
+- name: rhel-6.5
+  driver_config:
+    box: local-rhel-6.5
+    box_url: file://<%= File.expand_path('~') %>/opscode_rhel-6.5_chef-provisionerless.box
+- name: rhel-7.1
+  driver_config:
+    box: opscode-rhel-7.1
+    box_url: https://s3.amazonaws.com/st-vagrant-boxes/opscode_rhel-7.1_chef-provisionerless.box
+  attributes:
+    persistent_lvm:
+      filesystem: xfs
+- name: ubuntu-10.04
+  driver_config:
+    box: opscode-ubuntu-10.04
+- name: ubuntu-12.04
+  driver_config:
+    box: opscode-ubuntu-12.04
+- name: ubuntu-14.04
+  driver_config:
+    box: opscode-ubuntu-14.04
+
+suites:
+# This test suite mimics the behavior of being in a cloud which supports block device mapping
+# The loopback devices given in block_device_mapping_persistent<N> should be included in
+# the test/cookbooks/fake cookbook's attributes so they get created while running
+# the test. EC2 and openstack clouds follow this format.
+#
+- name: default
+  run_list: ["recipe[fake]", "recipe[persistent_lvm]"]
+  attributes:
+    cloud:
+      provider: vagrant
+    vagrant:
+      block_device_mapping_persistent0: loop0
+      block_device_mapping_persistent1: loop1
+
+# This test mimics the behavior of being in a google compute engine. The persistent disks
+# are mapped to /dev/disk/by-id/google-persistent-disk-<N>. Loopback device matching the
+# device index should be set in the test/cookbooks/fake cookbook's attributes
+# so they get created. For example, the following attributes will require the creation of
+# loopback devices "/dev/loop0" and "/dev/loop1"
+#
+- name: gce
+  run_list: ["recipe[fake::gce]", "recipe[persistent_lvm]"]
+  attributes:
+    cloud:
+      provider: gce
+    gce:
+      attached_disks:
+        disks:
+        - deviceName: boot
+          index: 0
+          mode: READ_WRITE
+          type: persistent
+        - deviceName: persistent-disk-0
+          index: 1
+          mode: READ_WRITE
+          type: persistent
+        - deviceName: persistent-disk-1
+          index: 2
+          mode: READ_WRITE
+          type: persistent
