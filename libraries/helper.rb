@@ -46,6 +46,15 @@ module persistentLvm
             "/dev/disk/by-id/scsi-0Google_PersistentDisk_#{disk["deviceName"]}"
           end
         end
+        #persistent_devices might be empty still. I guess it's caused by different chef versions
+        #second try to discover attached disks
+        if persistent_devices.empty?
+          persistent_devices = node[cloud]['instance']['attributes']['disks'].map do |disk|
+            if (disk['type'] == "PERSISTENT" or disk['type'] == "PERSISTENT-SSD") && disk['deviceName']!= "persistent-disk-0" && disk['deviceName']!= "boot-volume"
+              "/dev/disk/by-id/scsi-0Google_PersistentDisk_#{disk["deviceName"]}"
+            end
+          end
+        end
         # Removes nil elements from the persistent_devices array if any.
         persistent_devices.compact!
         Chef::Log.info "Persistent disks found for cloud '#{cloud}': #{persistent_devices.inspect}"
