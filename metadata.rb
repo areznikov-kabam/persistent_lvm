@@ -10,7 +10,7 @@ supports 'ubuntu'
 supports 'centos'
 supports 'debian'
 
-depends 'lvm', '~> 1.6.1'
+depends 'lvm'
 
 recipe "persistent_lvm::default", "Sets up persistent devices on a cloud server"
 
