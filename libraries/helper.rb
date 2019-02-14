@@ -86,9 +86,8 @@ module persistentLvm
         ephemeral_devices.compact!
         #
         #Final step: now we need to remove all the devices reported as ephemeral by ohai to be on the safe side
-        persistent_devices.reject!(|device| ephemeral_devices.include? device)
+        persistent_devices.reject {|device| ephemeral_devices.include? device}
         Chef::Log.info "Persistent disks found for nocloud detected': #{persistent_devices.inspect}"
-        end
       end
       persistent_devices
     end
