@@ -30,7 +30,7 @@ else
   # Obtain the available persistent devices. See "libraries/helper.rb" for the definition of
   # "get_persistent_devices" method.
   #
-  persistent_devices = persistentLvm::Helper.get_persistent_devices(cloud, node)
+  persistent_devices = PersistentLvm::Helper.get_persistent_devices(cloud, node)
 
   if persistent_devices.empty?
     log "No persistent disks found. Skipping setup."
