@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-module persistentLvm
+module PersistentLvm
   module Helper
     # Identifies the persistent devices available on a cloud server based on cloud-specific Ohai data and returns
     # them as an array. This method also does the mapping required for Xen hypervisors (/dev/sdX -> /dev/xvdX).
